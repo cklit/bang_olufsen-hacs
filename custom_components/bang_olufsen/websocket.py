@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import datetime
 import logging
 from typing import TYPE_CHECKING, Any
+import math
 
 from mozart_api.models import (
     BatteryState,
@@ -685,15 +686,9 @@ class HaloWebsocket(BeoBase):
         state: State,
     ) -> None:
         """Show wheel action preview."""
-        # Save original content if needed
-        if self._wheel_action_handlers[state.entity_id].content is None:
-            self._wheel_action_handlers[state.entity_id].content = get_button_from_id(
-                self._client.configuration, button_id
-            ).content
-
-        # Show preview of value
+        # Show preview of value in subtitle only, leaving content (icon) untouched
         _ = await self._client.update(
-            Update(UpdateButton(button_id, content=Text(preview_value))),
+            Update(UpdateButton(button_id, subtitle=preview_value)),
         )
 
     def _create_wheel_action_task(
